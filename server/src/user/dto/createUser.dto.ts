@@ -1,6 +1,6 @@
 import { IsEmail, IsString, Min } from 'class-validator'
 
-export class CreateCatDto {
+export class CreateUserDto {
 	@IsEmail()
 	@IsString()
 	email: string
