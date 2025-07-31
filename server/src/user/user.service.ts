@@ -3,6 +3,7 @@ import { User } from 'prisma/generated/prisma'
 import { CreateUserDto } from './dto/createUser.dto'
 import { PrismaService } from '../prisma.service'
 import { hash } from 'argon2'
+import { UpdateUserDto } from './dto/updateUser.dto'
 
 @Injectable()
 export class UserService {
@@ -33,7 +34,7 @@ export class UserService {
 		return this.prisma.user.findMany()
 	}
 
-	async findByEmail(email: string) {
+	async findByEmail(email: string): Promise<User | null> {
 
 		const user = await this.prisma.user.findUnique({
 			where: { email }
@@ -42,12 +43,36 @@ export class UserService {
 		return user
 	}
 
-	async findById(id: string) {
+	async findById(id: string): Promise<User | null> {
 
 		const user = await this.prisma.user.findUnique({
 			where: { id }
 		})
 
 		return user
+	}
+
+	async deleteUser(id: string): Promise<string> {
+		const user = await this.prisma.user.findUnique({
+			where: { id }
+		})
+
+		if (user) return `Пользователь с идентификатором ${user.id} удален.`
+
+		return `Удалить пользователя с идентификатором ${id} не удалось.`
+	}
+
+	async updateUser(id: string, updateData: UpdateUserDto): Promise<User | null> {
+			const user = await this.prisma.user.update({
+				where: {
+					id
+				},
+				data: {
+					email : updateData.email ? updateData.email : '',
+					name : updateData.name ? updateData.name : '',
+					password : updateData.password ? await hash(updateData.password) : ''
+				}
+			})
+			return user
 	}
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/createUser.dto'
 
@@ -15,7 +15,11 @@ export class UserController {
     return this.userService.findAllUsers()
   }
   @Get('find-by-id')
-  findById(@Query() param: { id: string }) {
-    return param.id
+  findById(@Query() params: { id: string }) {
+    return this.userService.findById(params.id)
+  }
+  @Delete('delete')
+  deleteUser(@Query() params: { id: string }) {
+    return this.userService.deleteUser(params.id)
   }
 }
