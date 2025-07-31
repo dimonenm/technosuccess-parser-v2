@@ -62,15 +62,15 @@ export class UserService {
 		return `Удалить пользователя с идентификатором ${id} не удалось.`
 	}
 
-	async updateUser(id: string, updateData: UpdateUserDto): Promise<User | null> {
+	async updateUser(updateUserDto: UpdateUserDto): Promise<User | null> {
 			const user = await this.prisma.user.update({
 				where: {
-					id
+					id: updateUserDto.id
 				},
 				data: {
-					email : updateData.email ? updateData.email : '',
-					name : updateData.name ? updateData.name : '',
-					password : updateData.password ? await hash(updateData.password) : ''
+					email : updateUserDto.email ? updateUserDto.email : '',
+					name : updateUserDto.name ? updateUserDto.name : '',
+					password : updateUserDto.password ? await hash(updateUserDto.password) : ''
 				}
 			})
 			return user
