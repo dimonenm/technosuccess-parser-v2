@@ -22,6 +22,12 @@ model User {
   email String  @unique
   name  String?
   password String
+  role Roles @default(USER)
 
   @@map("users")
+}
+
+enum Roles {
+  USER
+  ADMIN
 }

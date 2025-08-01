@@ -1,4 +1,5 @@
 import { IsEmail, IsString, Min } from 'class-validator'
+import { Roles } from 'prisma/generated/prisma'
 
 export class UpdateUserDto {
 	@IsString()
@@ -14,4 +15,7 @@ export class UpdateUserDto {
 	@IsString()
 	@Min(6)
 	password?: string
+
+	@IsString()
+	role?: Roles
 }

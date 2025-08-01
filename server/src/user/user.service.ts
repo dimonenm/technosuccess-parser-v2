@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common'
-import { User } from 'prisma/generated/prisma'
+import { Roles, User } from 'prisma/generated/prisma'
 import { CreateUserDto } from './dto/createUser.dto'
 import { PrismaService } from '../prisma.service'
 import { hash } from 'argon2'
@@ -53,9 +53,20 @@ export class UserService {
 	}
 
 	async deleteUser(id: string): Promise<string> {
-		const user = await this.prisma.user.findUnique({
-			where: { id }
-		})
+
+		const isExist = await this.findById(id)
+
+		if (isExist) {
+			const user = await this.prisma.user.delete({
+				where: { id }
+			})
+		}
+		throw new ConflictException('Регистрация не удалась. Пользователь с таким email уже существует.')
+
+
+
+
+		console.log('user: ', user)
 
 		if (user) return `Пользователь с идентификатором ${user.id} удален.`
 
@@ -63,16 +74,17 @@ export class UserService {
 	}
 
 	async updateUser(updateUserDto: UpdateUserDto): Promise<User | null> {
-			const user = await this.prisma.user.update({
-				where: {
-					id: updateUserDto.id
-				},
-				data: {
-					email : updateUserDto.email ? updateUserDto.email : '',
-					name : updateUserDto.name ? updateUserDto.name : '',
-					password : updateUserDto.password ? await hash(updateUserDto.password) : ''
-				}
-			})
-			return user
+		const user = await this.prisma.user.update({
+			where: {
+				id: updateUserDto.id
+			},
+			data: {
+				email: updateUserDto.email ? updateUserDto.email : '',
+				name: updateUserDto.name ? updateUserDto.name : '',
+				password: updateUserDto.password ? await hash(updateUserDto.password) : '',
+				role: updateUserDto.role ? updateUserDto.role : Roles.USER
+			}
+		})
+		return user
 	}
 }
