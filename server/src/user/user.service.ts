@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { Roles, User } from 'prisma/generated/prisma'
 import { CreateUserDto } from './dto/createUser.dto'
 import { PrismaService } from '../prisma.service'
@@ -60,17 +60,15 @@ export class UserService {
 			const user = await this.prisma.user.delete({
 				where: { id }
 			})
+
+			if (user) return `Пользователь с идентификатором ${user.id} удален.`
+
+			return `Удалить пользователя с идентификатором ${id} не удалось.`
 		}
-		throw new ConflictException('Регистрация не удалась. Пользователь с таким email уже существует.')
+			throw new NotFoundException(
+				'Пользователь с таким login не существует.',
+			)
 
-
-
-
-		console.log('user: ', user)
-
-		if (user) return `Пользователь с идентификатором ${user.id} удален.`
-
-		return `Удалить пользователя с идентификатором ${id} не удалось.`
 	}
 
 	async updateUser(updateUserDto: UpdateUserDto): Promise<User | null> {
